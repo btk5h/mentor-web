@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "fix:format": "prettier --write \"**/*.{js,json,md}\" --ignore-path .gitignore",
+    "test:format": "prettier --check \"**/*.{js,json,md}\" --ignore-path .gitignore"
   },
   "dependencies": {
     "@emotion/core": "^10.0.28",
@@ -16,6 +18,9 @@
     "twin.macro": "^1.0.0-alpha.9"
   },
   "devDependencies": {
-    "babel-plugin-macros": "^2.8.0"
+    "babel-plugin-macros": "^2.8.0",
+    "husky": "^4.2.5",
+    "prettier": "2.0.4",
+    "pretty-quick": "^2.0.1"
   }
 }
