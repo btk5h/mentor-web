@@ -50,7 +50,7 @@ export function normalize(dfa: DFA): NormalizedDFA {
   if (!output.stateTransitions[output.initialState]) {
     throw new ValidationError(
       `Initial state "${output.initialState}" is not a defined state`
-    )
+    );
   }
 
   for (const state of Object.keys(output.stateTransitions)) {
