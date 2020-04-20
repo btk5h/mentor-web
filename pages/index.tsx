@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo, useState } from "react";
+import Head from "next/head";
 import tw from "twin.macro";
 import { normalize, NormalizedDFA } from "utils/mentor";
 import { parseDFA } from "mentor-parser";
@@ -31,8 +32,24 @@ const Error = tw.div`
   rounded
 `;
 
+const Warning = tw.div`
+  p-4
+  bg-yellow-200
+  rounded
+`;
+
 const Title = tw.h1`
   text-2xl font-bold
+  mb-2
+`;
+
+const Text = tw.p`
+  mb-2
+`;
+
+const Link = tw.a`
+  text-blue-600
+  hover:underline
 `;
 
 const defaultDFA = `alphabet: {a}
@@ -74,6 +91,26 @@ const IndexPage: React.FC = () => {
 
   return (
     <PageLayout>
+      <Head>
+        <title>Mentor</title>
+      </Head>
+      <Block>
+        <Title>Web Mentor Proof of Concept</Title>
+        <Text>
+          This is a proof of concept for a web port of UCSB's Mentor, a tool for
+          testing automata.
+        </Text>
+        <Text>
+          Currently, this app only parses/validates Mentor's DFA syntax and
+          outputs a visualization of the DFA using Graphviz. In the future, the
+          goal of this project is to support all of the types of automata that
+          Mentor supports and to add tools for testing those automata.
+        </Text>
+        <Text>
+          Created by Bryan Terce, check out the source code on{" "}
+          <Link href="https://github.com/btk5h/mentor-web">GitHub</Link>.
+        </Text>
+      </Block>
       <Block>
         <Title>Mentor DFA Source</Title>
         <Editor rows={10} value={mentorSource} onChange={onChange} />
@@ -90,8 +127,12 @@ const IndexPage: React.FC = () => {
       </Block>
       <Block>
         <Title>State Machine Graph</Title>
-        {compileResult.fsm && (
+        {compileResult.fsm ? (
           <StateMachineGraph stateMachine={compileResult.fsm} />
+        ) : (
+          <Warning>
+            <p>Your DFA must be valid in order to generate a visualization.</p>
+          </Warning>
         )}
       </Block>
     </PageLayout>
