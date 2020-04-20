@@ -1,4 +1,4 @@
-import { DFA, Transition } from "mentor-parser/parsers/dfa";
+import { DFA } from "mentor-parser/parsers/dfa";
 
 class ValidationError extends Error {
   name = "ValidationError";
@@ -8,20 +8,24 @@ class ValidationError extends Error {
   }
 }
 
-type NormalizedDFA = {
-  alphabet: string[];
-  simpleAlphabet: boolean;
-  initialState: string;
-  stateTransitions: { [state: string]: { [symbol: string]: string } };
-};
+export class NormalizedDFA {
+  constructor(
+    readonly alphabet: string[],
+    readonly simpleAlphabet: boolean,
+    readonly initialState: string,
+    readonly acceptingStates: string[],
+    readonly stateTransitions: { [state: string]: { [symbol: string]: string } }
+  ) {}
+}
 
 export function normalize(dfa: DFA): NormalizedDFA {
-  const output: NormalizedDFA = {
-    alphabet: [...dfa.alphabet],
-    simpleAlphabet: dfa.alphabet.every((s) => s.length === 1),
-    initialState: dfa.initialState,
-    stateTransitions: {},
-  };
+  const output: NormalizedDFA = new NormalizedDFA(
+    [...dfa.alphabet],
+    dfa.alphabet.every((s) => s.length === 1),
+    dfa.initialState,
+    dfa.acceptingStates,
+    {}
+  );
 
   for (const st of dfa.stateTransitions) {
     let transitionMap = output.stateTransitions[st.state];
@@ -74,4 +78,21 @@ export function normalize(dfa: DFA): NormalizedDFA {
   }
 
   return output;
+}
+
+type Edge = {
+  start: string;
+  end: string;
+  symbol: string;
+};
+
+export function edgeList(dfa: NormalizedDFA): Edge[] {
+  return Object.entries(dfa.stateTransitions).flatMap(
+    ([start, transitionMap]) =>
+      Object.entries(transitionMap).flatMap(([symbol, end]) => ({
+        start,
+        end,
+        symbol,
+      }))
+  );
 }
