@@ -57,6 +57,14 @@ export function normalize(dfa: DFA): NormalizedDFA {
     );
   }
 
+  for (const state of output.acceptingStates) {
+    if (!output.stateTransitions[state]) {
+      throw new ValidationError(
+        `Accepting state "${state}" is not a defined state`
+      );
+    }
+  }
+
   for (const state of Object.keys(output.stateTransitions)) {
     const transitionMap = output.stateTransitions[state];
 
