@@ -8,6 +8,78 @@ class ValidationError extends Error {
   }
 }
 
+type FiniteAutomaton = {
+  readonly alphabet: string[];
+  readonly simpleAlphabet: boolean;
+  readonly initialState: string;
+  readonly acceptingStates: string[];
+  readonly stateTransitions: { [state: string]: object };
+};
+
+function validateInitialState(automaton: FiniteAutomaton) {
+  if (!automaton.stateTransitions[automaton.initialState]) {
+    throw new ValidationError(
+      `Initial state "${automaton.initialState}" is not a defined state`
+    );
+  }
+}
+
+function validateAcceptingStates(automaton: FiniteAutomaton) {
+  for (const state of automaton.acceptingStates) {
+    if (!automaton.stateTransitions[state]) {
+      throw new ValidationError(
+        `Accepting state "${state}" is not a defined state`
+      );
+    }
+  }
+}
+
+function populateDFATransitions(source: DFA, dfa: NormalizedDFA) {
+  for (const st of source.stateTransitions) {
+    let transitionMap = dfa.stateTransitions[st.state];
+
+    if (!transitionMap) {
+      transitionMap = dfa.stateTransitions[st.state] = {};
+    }
+
+    for (const t of st.transitions) {
+      if (!dfa.alphabet.includes(t.symbol)) {
+        throw new ValidationError(
+          `State transition "${st.state}" accepts "${t.symbol}", which is not in the alphabet`
+        );
+      }
+
+      if (transitionMap[t.symbol]) {
+        throw new ValidationError(
+          `Duplicate state transition from "${st.state}" under "${t.symbol}"`
+        );
+      }
+
+      transitionMap[t.symbol] = t.state;
+    }
+  }
+}
+
+function validateDFAComplete(dfa: NormalizedDFA) {
+  for (const [state, transitionMap] of Object.entries(dfa.stateTransitions)) {
+    for (const symbol of dfa.alphabet) {
+      if (!transitionMap.hasOwnProperty(symbol)) {
+        throw new ValidationError(
+          `State "${state}" missing transition for "${symbol}"`
+        );
+      }
+    }
+
+    for (const symbol of Object.keys(transitionMap)) {
+      if (!dfa.stateTransitions[transitionMap[symbol]]) {
+        throw new ValidationError(
+          `State transition from "${state}" under "${symbol}" transitions to "${transitionMap[symbol]}", which is not a defined state`
+        );
+      }
+    }
+  }
+}
+
 export class NormalizedDFA {
   constructor(
     readonly alphabet: string[],
@@ -27,63 +99,10 @@ export function normalize(dfa: DFA): NormalizedDFA {
     {}
   );
 
-  for (const st of dfa.stateTransitions) {
-    let transitionMap = output.stateTransitions[st.state];
-
-    if (!transitionMap) {
-      transitionMap = output.stateTransitions[st.state] = {};
-    }
-
-    for (const t of st.transitions) {
-      if (!output.alphabet.includes(t.symbol)) {
-        throw new ValidationError(
-          `State transition "${st.state}" accepts "${t.symbol}", which is not in the alphabet`
-        );
-      }
-
-      if (transitionMap[t.symbol]) {
-        throw new ValidationError(
-          `Duplicate state transition from "${st.state}" under "${t.symbol}"`
-        );
-      }
-
-      transitionMap[t.symbol] = t.state;
-    }
-  }
-
-  if (!output.stateTransitions[output.initialState]) {
-    throw new ValidationError(
-      `Initial state "${output.initialState}" is not a defined state`
-    );
-  }
-
-  for (const state of output.acceptingStates) {
-    if (!output.stateTransitions[state]) {
-      throw new ValidationError(
-        `Accepting state "${state}" is not a defined state`
-      );
-    }
-  }
-
-  for (const state of Object.keys(output.stateTransitions)) {
-    const transitionMap = output.stateTransitions[state];
-
-    for (const symbol of output.alphabet) {
-      if (!transitionMap.hasOwnProperty(symbol)) {
-        throw new ValidationError(
-          `State "${state}" missing transition for "${symbol}"`
-        );
-      }
-    }
-
-    for (const symbol of Object.keys(transitionMap)) {
-      if (!output.stateTransitions[transitionMap[symbol]]) {
-        throw new ValidationError(
-          `State transition from "${state}" under "${symbol}" transitions to "${transitionMap[symbol]}", which is not a defined state`
-        );
-      }
-    }
-  }
+  populateDFATransitions(dfa, output);
+  validateInitialState(output);
+  validateAcceptingStates(output);
+  validateDFAComplete(output);
 
   return output;
 }
