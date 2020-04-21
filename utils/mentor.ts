@@ -1,4 +1,5 @@
 import { DFA } from "mentor-parser/parsers/dfa";
+import { NFA } from "mentor-parser/parsers/nfa";
 
 class ValidationError extends Error {
   name = "ValidationError";
@@ -8,7 +9,7 @@ class ValidationError extends Error {
   }
 }
 
-type FiniteAutomaton = {
+export type FiniteAutomaton = {
   readonly alphabet: string[];
   readonly simpleAlphabet: boolean;
   readonly initialState: string;
@@ -90,7 +91,7 @@ export class NormalizedDFA {
   ) {}
 }
 
-export function normalize(dfa: DFA): NormalizedDFA {
+export function normalizeDFA(dfa: DFA): NormalizedDFA {
   const output: NormalizedDFA = new NormalizedDFA(
     [...dfa.alphabet],
     dfa.alphabet.every((s) => s.length === 1),
@@ -113,7 +114,7 @@ type Edge = {
   symbol: string;
 };
 
-export function edgeList(dfa: NormalizedDFA): Edge[] {
+function edgeListDFA(dfa: NormalizedDFA): Edge[] {
   return Object.entries(dfa.stateTransitions).flatMap(
     ([start, transitionMap]) =>
       Object.entries(transitionMap).flatMap(([symbol, end]) => ({
@@ -122,4 +123,93 @@ export function edgeList(dfa: NormalizedDFA): Edge[] {
         symbol,
       }))
   );
+}
+
+function populateNFATransitions(source: NFA, nfa: NormalizedNFA) {
+  function ensureHasState(state: string) {
+    let transitionMap = nfa.stateTransitions[state];
+
+    if (!transitionMap) {
+      transitionMap = nfa.stateTransitions[state] = {};
+    }
+
+    return transitionMap;
+  }
+
+  function ensureHasEdges(
+    transitionMap: { [symbol: string]: string[] },
+    symbol: string
+  ) {
+    let transitionArray = transitionMap[symbol];
+
+    if (!transitionArray) {
+      transitionArray = transitionMap[symbol] = [];
+    }
+
+    return transitionArray;
+  }
+
+  for (const st of source.stateTransitions) {
+    const start = st.state;
+    const transitionMap = ensureHasState(start);
+
+    for (const { symbol, state: end } of st.transitions) {
+      ensureHasState(end);
+      const transitionArray = ensureHasEdges(transitionMap, symbol);
+      transitionArray.push(end);
+    }
+  }
+}
+
+export class NormalizedNFA {
+  constructor(
+    readonly alphabet: string[],
+    readonly simpleAlphabet: boolean,
+    readonly initialState: string,
+    readonly acceptingStates: string[],
+    readonly stateTransitions: {
+      [state: string]: { [symbol: string]: string[] };
+    }
+  ) {}
+}
+
+export function normalizeNFA(nfa: NFA): NormalizedNFA {
+  const output: NormalizedNFA = new NormalizedNFA(
+    [...nfa.alphabet],
+    nfa.alphabet.every((s) => s.length === 1),
+    nfa.initialState,
+    nfa.acceptingStates,
+    {}
+  );
+
+  populateNFATransitions(nfa, output);
+  validateInitialState(output);
+  validateAcceptingStates(output);
+
+  return output;
+}
+
+function edgeListNFA(nfa: NormalizedNFA): Edge[] {
+  return Object.entries(nfa.stateTransitions).flatMap(
+    ([start, transitionMap]) =>
+      Object.entries(transitionMap).flatMap(([symbol, endStates]) =>
+        endStates.flatMap((end) => ({
+          start,
+          end,
+          symbol,
+        }))
+      )
+  );
+}
+
+export function edgeList(automaton: FiniteAutomaton): Edge[] {
+  if (automaton instanceof NormalizedDFA) {
+    return edgeListDFA(automaton);
+  }
+
+  if (automaton instanceof NormalizedNFA) {
+    return edgeListNFA(automaton);
+  }
+
+  return [];
 }

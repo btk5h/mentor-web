@@ -1,9 +1,16 @@
 import React, { useCallback, useMemo, useState } from "react";
 import Head from "next/head";
+import dynamic from "next/dynamic";
 import tw from "twin.macro";
-import { normalize, NormalizedDFA } from "utils/mentor";
-import { parseDFA } from "mentor-parser";
-import StateMachineGraph from "components/StateMachineGraph";
+import AutomataSelect, {
+  AutomatonType,
+  getParser,
+} from "components/AutomataSelect";
+import { FiniteAutomaton } from "utils/mentor";
+const StateMachineGraph = dynamic(
+  () => import("components/StateMachineGraph"),
+  { ssr: false }
+);
 
 const PageLayout = tw.div`
   min-h-screen
@@ -52,6 +59,10 @@ const Link = tw.a`
   hover:underline
 `;
 
+const InputSection = tw.div`
+  mb-4
+`;
+
 const defaultDFA = `alphabet: {a}
 start: Q0
 accepting: {Q0}
@@ -66,28 +77,29 @@ type ErrorLocation = {
   column: number;
 };
 
-type FSMOrError =
-  | { fsm: NormalizedDFA; error?: never }
+type AutomatonOrError =
+  | { automaton: FiniteAutomaton; error?: never }
   | {
-      fsm?: never;
+      automaton?: never;
       error: { name: string; message: string; location?: ErrorLocation };
     };
 
 const IndexPage: React.FC = () => {
+  const [automatonType, setAutomatonType] = useState<AutomatonType>("DFA");
   const [mentorSource, setMentorSource] = useState(defaultDFA);
 
   const onChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setMentorSource(e.target.value);
   }, []);
 
-  const compileResult = useMemo<FSMOrError>(() => {
+  const compileResult = useMemo<AutomatonOrError>(() => {
     try {
-      return { fsm: normalize(parseDFA(mentorSource)) };
+      return { automaton: getParser(automatonType)(mentorSource) };
     } catch (e) {
       const location = e?.location?.start || undefined;
       return { error: { name: e.name, message: e.message, location } };
     }
-  }, [mentorSource]);
+  }, [mentorSource, automatonType]);
 
   return (
     <PageLayout>
@@ -101,10 +113,11 @@ const IndexPage: React.FC = () => {
           testing automata.
         </Text>
         <Text>
-          Currently, this app only parses/validates Mentor's DFA syntax and
-          outputs a visualization of the DFA using Graphviz. In the future, the
-          goal of this project is to support all of the types of automata that
-          Mentor supports and to add tools for testing those automata.
+          Currently, this app only parses/validates Mentor's DFA/NFA syntax and
+          outputs a visualization of the automaton using Graphviz. In the
+          future, the goal of this project is to support all of the types of
+          automata that Mentor supports and to add tools for testing those
+          automata.
         </Text>
         <Text>
           Created by Bryan Terce, check out the source code on{" "}
@@ -112,7 +125,13 @@ const IndexPage: React.FC = () => {
         </Text>
       </Block>
       <Block>
-        <Title>Mentor DFA Source</Title>
+        <Title>Mentor Source</Title>
+        <InputSection>
+          <label>
+            {"Automaton Type: "}
+            <AutomataSelect value={automatonType} onChange={setAutomatonType} />
+          </label>
+        </InputSection>
         <Editor rows={10} value={mentorSource} onChange={onChange} />
         {compileResult.error && (
           <Error>
@@ -127,11 +146,14 @@ const IndexPage: React.FC = () => {
       </Block>
       <Block>
         <Title>State Machine Graph</Title>
-        {compileResult.fsm ? (
-          <StateMachineGraph stateMachine={compileResult.fsm} />
+        {compileResult.automaton ? (
+          <StateMachineGraph stateMachine={compileResult.automaton} />
         ) : (
           <Warning>
-            <p>Your DFA must be valid in order to generate a visualization.</p>
+            <p>
+              Your {automatonType} must be valid in order to generate a
+              visualization.
+            </p>
           </Warning>
         )}
       </Block>

@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "@emotion/styled/macro";
-import { edgeList, NormalizedDFA } from "utils/mentor";
 import { Graphviz } from "graphviz-react";
+import { edgeList, FiniteAutomaton } from "utils/mentor";
 
 const Wrapper = styled.div`
   svg {
@@ -9,21 +9,22 @@ const Wrapper = styled.div`
   }
 `;
 
-function getDotSource(dfa: NormalizedDFA) {
-  const edges = edgeList(dfa);
+function getDotSource(automaton: FiniteAutomaton) {
+  const edges = edgeList(automaton);
 
   return `
     digraph {
       rankdir=LR;
       size="8,5";
       node [shape=point]; __start;
-      node [shape = doublecircle]; ${dfa.acceptingStates.join()};
+      node [shape = doublecircle]; ${automaton.acceptingStates.join()};
       node [shape = circle];
       
-      __start -> ${dfa.initialState} [arrowhead = empty];
+      __start -> ${automaton.initialState} [arrowhead = empty];
       ${edges
         .map(
-          (edge) => `${edge.start} -> ${edge.end} [label = "${edge.symbol}"];`
+          (edge) =>
+            `${edge.start} -> ${edge.end} [label = "${edge.symbol || "λ"}"];`
         )
         .join("\n")}
     }
@@ -31,7 +32,7 @@ function getDotSource(dfa: NormalizedDFA) {
 }
 
 type StateMachineGraphProps = {
-  stateMachine: NormalizedDFA;
+  stateMachine: FiniteAutomaton;
 };
 
 const StateMachineGraph: React.FC<StateMachineGraphProps> = (props) => {
