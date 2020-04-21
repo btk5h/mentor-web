@@ -154,6 +154,12 @@ function populateNFATransitions(source: NFA, nfa: NormalizedNFA) {
     const transitionMap = ensureHasState(start);
 
     for (const { symbol, state: end } of st.transitions) {
+      if (symbol && !nfa.alphabet.includes(symbol)) {
+        throw new ValidationError(
+          `State transition "${st.state}" accepts "${symbol}", which is not in the alphabet`
+        );
+      }
+
       ensureHasState(end);
       const transitionArray = ensureHasEdges(transitionMap, symbol);
       transitionArray.push(end);
