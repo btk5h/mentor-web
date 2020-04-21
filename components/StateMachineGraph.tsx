@@ -1,6 +1,13 @@
 import React from "react";
+import styled from "@emotion/styled/macro";
 import { edgeList, NormalizedDFA } from "utils/mentor";
 import { Graphviz } from "graphviz-react";
+
+const Wrapper = styled.div`
+  svg {
+    width: 100%;
+  }
+`;
 
 function getDotSource(dfa: NormalizedDFA) {
   const edges = edgeList(dfa);
@@ -30,10 +37,12 @@ type StateMachineGraphProps = {
 const StateMachineGraph: React.FC<StateMachineGraphProps> = (props) => {
   const { stateMachine } = props;
   return (
-    <Graphviz
-      dot={getDotSource(stateMachine)}
-      options={{ width: undefined, height: undefined }}
-    />
+    <Wrapper>
+      <Graphviz
+        dot={getDotSource(stateMachine)}
+        options={{ width: undefined, height: undefined }}
+      />
+    </Wrapper>
   );
 };
 
