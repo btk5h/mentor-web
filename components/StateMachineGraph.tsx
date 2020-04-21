@@ -29,7 +29,12 @@ type StateMachineGraphProps = {
 
 const StateMachineGraph: React.FC<StateMachineGraphProps> = (props) => {
   const { stateMachine } = props;
-  return <Graphviz dot={getDotSource(stateMachine)} />;
+  return (
+    <Graphviz
+      dot={getDotSource(stateMachine)}
+      options={{ width: undefined, height: undefined }}
+    />
+  );
 };
 
 export default StateMachineGraph;
