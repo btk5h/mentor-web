@@ -1,0 +1,21 @@
+{
+  "name": "Mentor",
+  "short_name": "Mentor",
+  "description": "A web app for testing automata",
+  "start_url": "/",
+  "display": "minimal-ui",
+  "background_color": "#eef0f2",
+  "theme_color": "#003660",
+  "icons": [
+    {
+      "src": "/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    },
+    {
+      "src": "/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    }
+  ]
+}
