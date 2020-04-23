@@ -1,52 +1,50 @@
 import React, { useCallback, useMemo, useState } from "react";
 import Head from "next/head";
-import dynamic from "next/dynamic";
 import tw from "twin.macro";
 import AutomataSelect, {
   AutomatonType,
   getParser,
 } from "components/AutomataSelect";
+import TextArea from "components/TextArea";
+import { Info, Fatal } from "components/Alert";
+import StateMachineGraph from "components/StateMachineGraph";
 import { FiniteAutomaton } from "utils/mentor";
-const StateMachineGraph = dynamic(
-  () => import("components/StateMachineGraph"),
-  { ssr: false }
-);
 
-const PageLayout = tw.div`
+const Layout = tw.div`
+  flex flex-col
+  md:flex-row
   min-h-screen
-  bg-gray-200
-  py-px
 `;
 
-const Block = tw.div`
-  p-6 my-4 mx-auto
-  max-w-screen-md
+const EditorPane = tw.div`
+  px-6 py-4
+  md:max-w-md
+  flex-grow
   bg-white
-  rounded-lg
-  shadow
+  shadow z-20
 `;
 
-const Editor = tw.textarea`
-  p-4
-  w-full
-  bg-gray-100
-  rounded
+const InnerStuff = tw.div`
+  flex flex-col
+  lg:flex-row
+  flex-grow
 `;
 
-const Error = tw.div`
-  p-4
-  bg-red-200
-  rounded
+const DetailsPane = tw.div`
+  px-6 py-4
+  lg:max-w-xs
+  flex-grow
+  bg-gray-100 
+  shadow z-10
 `;
 
-const Warning = tw.div`
-  p-4
-  bg-yellow-200
-  rounded
+const PreviewPane = tw.div`
+  flex-grow
+  bg-gray-200 
 `;
 
 const Title = tw.h1`
-  text-2xl font-bold
+  text-4xl font-bold
   mb-2
 `;
 
@@ -55,12 +53,8 @@ const Text = tw.p`
 `;
 
 const Link = tw.a`
-  text-blue-600
+  text-blue-700
   hover:underline
-`;
-
-const InputSection = tw.div`
-  mb-4
 `;
 
 const defaultDFA = `alphabet: {a}
@@ -84,7 +78,18 @@ type AutomatonOrError =
       error: { name: string; message: string; location?: ErrorLocation };
     };
 
-const IndexPage: React.FC = () => {
+function useAutomaton(source: string, type: AutomatonType) {
+  return useMemo<AutomatonOrError>(() => {
+    try {
+      return { automaton: getParser(type)(source) };
+    } catch (e) {
+      const location = e?.location?.start || undefined;
+      return { error: { name: e.name, message: e.message, location } };
+    }
+  }, [source, type]);
+}
+
+const TestPage: React.FC = () => {
   const [automatonType, setAutomatonType] = useState<AutomatonType>("DFA");
   const [mentorSource, setMentorSource] = useState(defaultDFA);
 
@@ -92,22 +97,20 @@ const IndexPage: React.FC = () => {
     setMentorSource(e.target.value);
   }, []);
 
-  const compileResult = useMemo<AutomatonOrError>(() => {
-    try {
-      return { automaton: getParser(automatonType)(mentorSource) };
-    } catch (e) {
-      const location = e?.location?.start || undefined;
-      return { error: { name: e.name, message: e.message, location } };
-    }
-  }, [mentorSource, automatonType]);
+  const compileResult = useAutomaton(mentorSource, automatonType);
 
   return (
-    <PageLayout>
+    <Layout>
       <Head>
         <title>Mentor</title>
       </Head>
-      <Block>
-        <Title>Web Mentor Proof of Concept</Title>
+      <EditorPane>
+        <Title>Mentor</Title>
+        <label>
+          {"Automaton Type: "}
+          <AutomataSelect value={automatonType} onChange={setAutomatonType} />
+        </label>
+        <TextArea rows={10} value={mentorSource} onChange={onChange} />
         <Text>
           This is a proof of concept for a web port of UCSB's Mentor, a tool for
           testing automata.
@@ -123,42 +126,31 @@ const IndexPage: React.FC = () => {
           Created by Bryan Terce, check out the source code on{" "}
           <Link href="https://github.com/btk5h/mentor-web">GitHub</Link>.
         </Text>
-      </Block>
-      <Block>
-        <Title>Mentor Source</Title>
-        <InputSection>
-          <label>
-            {"Automaton Type: "}
-            <AutomataSelect value={automatonType} onChange={setAutomatonType} />
-          </label>
-        </InputSection>
-        <Editor rows={10} value={mentorSource} onChange={onChange} />
-        {compileResult.error && (
-          <Error>
-            <b>{compileResult.error.name}</b>
-            <p>
-              {compileResult.error.location &&
-                `Line ${compileResult.error.location.line}, column ${compileResult.error.location.column}: `}
-              {compileResult.error.message}
-            </p>
-          </Error>
-        )}
-      </Block>
-      <Block>
-        <Title>State Machine Graph</Title>
-        {compileResult.automaton ? (
-          <StateMachineGraph stateMachine={compileResult.automaton} />
-        ) : (
-          <Warning>
-            <p>
-              Your {automatonType} must be valid in order to generate a
-              visualization.
-            </p>
-          </Warning>
-        )}
-      </Block>
-    </PageLayout>
+      </EditorPane>
+      <InnerStuff>
+        <DetailsPane>
+          {compileResult.automaton && (
+            <Info>Your {automatonType} is valid</Info>
+          )}
+          {compileResult.error && (
+            <Fatal>
+              <b>{compileResult.error.name}</b>
+              <p>
+                {compileResult.error.location &&
+                  `Line ${compileResult.error.location.line}, column ${compileResult.error.location.column}: `}
+                {compileResult.error.message}
+              </p>
+            </Fatal>
+          )}
+        </DetailsPane>
+        <PreviewPane>
+          {compileResult.automaton && (
+            <StateMachineGraph stateMachine={compileResult.automaton} />
+          )}
+        </PreviewPane>
+      </InnerStuff>
+    </Layout>
   );
 };
 
-export default IndexPage;
+export default TestPage;

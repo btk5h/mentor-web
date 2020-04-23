@@ -4,8 +4,16 @@ import { Graphviz } from "graphviz-react";
 import { edgeList, FiniteAutomaton } from "utils/mentor";
 
 const Wrapper = styled.div`
+  height: 100%;
+
+  & > div {
+    height: 100%;
+  }
+
   svg {
-    width: 100%;
+    polygon[fill="#ffffff"] {
+      fill: transparent;
+    }
   }
 `;
 
@@ -40,8 +48,9 @@ const StateMachineGraph: React.FC<StateMachineGraphProps> = (props) => {
   return (
     <Wrapper>
       <Graphviz
+        key={JSON.stringify(stateMachine)} // prevent React from reusing this component
         dot={getDotSource(stateMachine)}
-        options={{ width: undefined, height: undefined }}
+        options={{ width: "100%", height: "100%", zoom: true }}
       />
     </Wrapper>
   );
