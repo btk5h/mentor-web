@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useState } from "react";
 import Head from "next/head";
+import dynamic from "next/dynamic";
 import tw from "twin.macro";
 import AutomataSelect, {
   AutomatonType,
@@ -7,8 +8,11 @@ import AutomataSelect, {
 } from "components/AutomataSelect";
 import TextArea from "components/TextArea";
 import { Info, Fatal } from "components/Alert";
-import StateMachineGraph from "components/StateMachineGraph";
 import { FiniteAutomaton } from "utils/mentor";
+const StateMachineGraph = dynamic(
+  () => import("components/StateMachineGraph"),
+  { ssr: false }
+);
 
 const Layout = tw.div`
   flex flex-col
