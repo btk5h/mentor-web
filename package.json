@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "fix:format": "prettier --write \"**/*.{js,ts,tsx,json,md}\" --ignore-path .gitignore",
-    "test:format": "prettier --check \"**/*.{js,ts,tsx,json,md}\" --ignore-path .gitignore"
+    "test:format": "prettier --check \"**/*.{js,ts,tsx,json,md}\" --ignore-path .gitignore",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
   },
   "husky": {
     "hooks": {
@@ -28,14 +30,28 @@
     "twin.macro": "^1.0.0-alpha.9"
   },
   "devDependencies": {
+    "@babel/core": "^7.9.0",
+    "@storybook/addon-a11y": "^5.3.18",
+    "@storybook/addon-actions": "^5.3.18",
+    "@storybook/addon-info": "^5.3.18",
+    "@storybook/addon-knobs": "^5.3.18",
+    "@storybook/addon-links": "^5.3.18",
+    "@storybook/addon-storysource": "^5.3.18",
+    "@storybook/addon-viewport": "^5.3.18",
+    "@storybook/addons": "^5.3.18",
+    "@storybook/preset-typescript": "^3.0.0",
+    "@storybook/react": "^5.3.18",
     "@types/node": "^13.13.0",
+    "babel-loader": "^8.1.0",
     "babel-plugin-macros": "^2.8.0",
+    "fork-ts-checker-webpack-plugin": "^4.1.3",
     "husky": "^4.2.5",
     "next-compose-plugins": "^2.2.0",
     "next-offline": "^5.0.1",
     "next-transpile-modules": "^3.2.0",
     "prettier": "2.0.4",
     "pretty-quick": "^2.0.1",
+    "ts-loader": "^7.0.1",
     "typescript": "^3.8.3"
   }
 }
