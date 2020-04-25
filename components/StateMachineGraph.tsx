@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "@emotion/styled/macro";
 import { Graphviz } from "graphviz-react";
-import { edgeList, FiniteAutomaton } from "utils/mentor";
+import { collapseEdges, edgeList, FiniteAutomaton } from "utils/mentor";
 
 const Wrapper = styled.div`
   height: 100%;
@@ -17,8 +17,11 @@ const Wrapper = styled.div`
   }
 `;
 
-function getDotSource(automaton: FiniteAutomaton) {
-  const edges = edgeList(automaton);
+function getDotSource(automaton: FiniteAutomaton, { collapse = false }) {
+  let edges = edgeList(automaton);
+  if (collapse) {
+    edges = collapseEdges(edges);
+  }
 
   return `
     digraph {
@@ -41,15 +44,16 @@ function getDotSource(automaton: FiniteAutomaton) {
 
 type StateMachineGraphProps = {
   stateMachine: FiniteAutomaton;
+  collapse?: boolean;
 };
 
 const StateMachineGraph: React.FC<StateMachineGraphProps> = (props) => {
-  const { stateMachine } = props;
+  const { stateMachine, collapse } = props;
   return (
     <Wrapper>
       <Graphviz
-        key={JSON.stringify(stateMachine)} // prevent React from reusing this component
-        dot={getDotSource(stateMachine)}
+        key={JSON.stringify(props)} // prevent React from reusing this component
+        dot={getDotSource(stateMachine, { collapse })}
         options={{ width: "100%", height: "100%", zoom: true }}
       />
     </Wrapper>

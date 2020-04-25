@@ -96,10 +96,18 @@ function useAutomaton(source: string, type: AutomatonType) {
 const TestPage: React.FC = () => {
   const [automatonType, setAutomatonType] = useState<AutomatonType>("DFA");
   const [mentorSource, setMentorSource] = useState(defaultDFA);
+  const [collapseEdges, setCollapseEdges] = useState(true);
 
   const onChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setMentorSource(e.target.value);
   }, []);
+
+  const onSetCollapseEdges = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setCollapseEdges(e.target.checked);
+    },
+    []
+  );
 
   const compileResult = useAutomaton(mentorSource, automatonType);
 
@@ -113,6 +121,15 @@ const TestPage: React.FC = () => {
         <label>
           {"Automaton Type: "}
           <AutomataSelect value={automatonType} onChange={setAutomatonType} />
+        </label>
+        <br />
+        <label>
+          {"Collapse similar edges: "}
+          <input
+            type="checkbox"
+            checked={collapseEdges}
+            onChange={onSetCollapseEdges}
+          />
         </label>
         <TextArea rows={10} value={mentorSource} onChange={onChange} />
         <Text>
@@ -149,7 +166,10 @@ const TestPage: React.FC = () => {
         </DetailsPane>
         <PreviewPane>
           {compileResult.automaton && (
-            <StateMachineGraph stateMachine={compileResult.automaton} />
+            <StateMachineGraph
+              stateMachine={compileResult.automaton}
+              collapse={collapseEdges}
+            />
           )}
         </PreviewPane>
       </InnerStuff>

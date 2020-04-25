@@ -219,3 +219,28 @@ export function edgeList(automaton: FiniteAutomaton): Edge[] {
 
   return [];
 }
+
+export function collapseEdges(edges: Edge[]): Edge[] {
+  edges = [...edges].sort((a, b) =>
+    a.start !== b.start
+      ? a.start.localeCompare(b.start)
+      : a.end.localeCompare(b.end)
+  );
+
+  return edges.reduce((acc, edge) => {
+    if (!acc.length) {
+      return [edge];
+    }
+
+    const top = acc[acc.length - 1];
+
+    if (edge.start === top.start && edge.end === top.end) {
+      return [
+        ...acc.slice(0, acc.length - 1),
+        { ...top, symbol: `${top.symbol}, ${edge.symbol}` },
+      ];
+    }
+
+    return [...acc, edge];
+  }, [] as Edge[]);
+}
