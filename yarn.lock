@@ -6808,10 +6808,10 @@ memory-fs@^0.5.0:
     errno "^0.1.3"
     readable-stream "^2.0.1"
 
-mentor-parser@^0.4.0:
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/mentor-parser/-/mentor-parser-0.4.0.tgz#84b52f7382c0c1011754b05adb36d9be0bb3ba59"
-  integrity sha512-dENwJV+Iu44kU+KvsKopXcwsCuike1BpW6rTrn/oTgSbnTZjXaFU/T3S1aZA5DKlq9FbTQ1drb/6ysgCKYzQ1Q==
+mentor-parser@^0.6.0:
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/mentor-parser/-/mentor-parser-0.6.0.tgz#19e32fa56895768da3cce4b7834feacd6bf7c055"
+  integrity sha512-Hzbep/WIwdSXqa4ELfmhXa0QqgG7FxVivz43vdQV3MXwvlMfdLA/AhCgi3bBbYXV6Lx1sQXqq+cYsStcKxhxlw==
 
 merge-deep@^3.0.2:
   version "3.0.2"
