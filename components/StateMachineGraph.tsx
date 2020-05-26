@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "@emotion/styled/macro";
 import { Graphviz } from "graphviz-react";
+import fastDeepEqual from "fast-deep-equal";
 import { collapseEdges, edgeList, FiniteAutomaton } from "utils/mentor";
 
 const Wrapper = styled.div`
@@ -60,4 +61,4 @@ const StateMachineGraph: React.FC<StateMachineGraphProps> = (props) => {
   );
 };
 
-export default StateMachineGraph;
+export default React.memo(StateMachineGraph, fastDeepEqual);

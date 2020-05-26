@@ -8,7 +8,10 @@ import AutomataSelect, {
 } from "components/AutomataSelect";
 import TextArea from "components/TextArea";
 import { Info, Fatal } from "components/Alert";
-import { FiniteAutomaton } from "utils/mentor";
+import { FiniteAutomaton, NormalizedDFA, NormalizedNFA } from "utils/mentor";
+import { acceptDFA, acceptNFA } from "utils/accept";
+import TestInput from "components/TestInput";
+
 const StateMachineGraph = dynamic(
   () => import("components/StateMachineGraph"),
   { ssr: false }
@@ -97,6 +100,7 @@ const TestPage: React.FC = () => {
   const [automatonType, setAutomatonType] = useState<AutomatonType>("DFA");
   const [mentorSource, setMentorSource] = useState(defaultDFA);
   const [collapseEdges, setCollapseEdges] = useState(true);
+  const [test, setTest] = useState("");
 
   const onChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setMentorSource(e.target.value);
@@ -110,6 +114,28 @@ const TestPage: React.FC = () => {
   );
 
   const compileResult = useAutomaton(mentorSource, automatonType);
+
+  const testFunction = useMemo(() => {
+    if (compileResult.automaton instanceof NormalizedDFA) {
+      return acceptDFA;
+    } else if (compileResult.automaton instanceof NormalizedNFA) {
+      return acceptNFA;
+    }
+  }, [compileResult]);
+
+  const testResult = useMemo(() => {
+    if (testFunction) {
+      try {
+        return testFunction(compileResult.automaton as any, test)
+          ? "accept"
+          : "reject";
+      } catch {
+        return "reject";
+      }
+    }
+
+    return "reject";
+  }, [testFunction, test]);
 
   return (
     <Layout>
@@ -162,6 +188,9 @@ const TestPage: React.FC = () => {
                 {compileResult.error.message}
               </p>
             </Fatal>
+          )}
+          {testFunction && (
+            <TestInput value={test} onChange={setTest} state={testResult} />
           )}
         </DetailsPane>
         <PreviewPane>
