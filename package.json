@@ -53,6 +53,6 @@
     "prettier": "2.0.5",
     "pretty-quick": "^2.0.1",
     "ts-loader": "^7.0.5",
-    "typescript": "^3.9.3"
+    "typescript": "^3.9.5"
   }
 }
