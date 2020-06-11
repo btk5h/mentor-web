@@ -29,14 +29,18 @@ function getDotSource(automaton: FiniteAutomaton, { collapse = false }) {
       rankdir=LR;
       size="8,5";
       node [shape=point]; __start;
-      node [shape = doublecircle]; ${automaton.acceptingStates.join()};
+      node [shape = doublecircle]; ${automaton.acceptingStates
+        .map((state) => `"${state}"`)
+        .join()};
       node [shape = circle];
       
       __start -> ${automaton.initialState} [arrowhead = empty];
       ${edges
         .map(
           (edge) =>
-            `${edge.start} -> ${edge.end} [label = "${edge.symbol || "λ"}"];`
+            `"${edge.start}" -> "${edge.end}" [label = "${
+              edge.symbol || "λ"
+            }"];`
         )
         .join("\n")}
     }
