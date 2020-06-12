@@ -4264,7 +4264,7 @@ d3-format@^1.2.0:
   resolved "https://registry.yarnpkg.com/d3-format/-/d3-format-1.4.4.tgz#356925f28d0fd7c7983bfad593726fce46844030"
   integrity sha512-TWks25e7t8/cqctxCmxpUuzZN11QxIA7YrMbram94zMQ0PXjE4LVIMe/f6a4+xxL8HQ3OsAFULOINQi1pE62Aw==
 
-d3-graphviz@^2.6.0:
+d3-graphviz@^2.6.1:
   version "2.6.1"
   resolved "https://registry.yarnpkg.com/d3-graphviz/-/d3-graphviz-2.6.1.tgz#61b93fe330e6339198fd2090f8080d7d4282c514"
   integrity sha512-878AFSagQyr5tTOrM7YiVYeUC2/NoFcOB3/oew+LAML0xekyJSw9j3WOCUMBsc95KYe9XBYZ+SKKuObVya1tJQ==
@@ -5579,13 +5579,13 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.3.tgz#4a12ff1b60376ef09862c2093edd908328be8423"
   integrity sha512-a30VEBm4PEdx1dRB7MFK7BejejvCvBronbLjht+sHuGYj8PHs7M/5Z+rt5lw551vZ7yfTCj4Vuyy3mSJytDWRQ==
 
-graphviz-react@^1.0.4:
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/graphviz-react/-/graphviz-react-1.0.4.tgz#86af1f88bf50e7ead4addc0886eb1af7404061e1"
-  integrity sha512-pD9BlD7By+mLL3F4MHWdZhlBJNKR9aqmX6awysQSs1+ztNcELaVbnsUn2WZmcd0c49O6EWUye3aXGw25ypSnWQ==
+graphviz-react@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/graphviz-react/-/graphviz-react-1.0.5.tgz#5613bd5e57d9abcaba066a7e9e83294a9001d40e"
+  integrity sha512-fBTakiFKq1Sk1XYghE+s6Pl4fgAK0InDFY6o2JczibQxMDjDnsUGNYz6CRwW81zhYGlKD/GQqS91pc3T077Hnw==
   dependencies:
-    d3-graphviz "^2.6.0"
-    react "^16.6.0"
+    d3-graphviz "^2.6.1"
+    react "^16.13.1"
 
 gud@^1.0.0:
   version "1.0.0"
@@ -8865,7 +8865,7 @@ react-transition-group@^4.3.0:
     loose-envify "^1.4.0"
     prop-types "^15.6.2"
 
-react@^16.6.0, react@^16.8.3:
+react@^16.13.1, react@^16.8.3:
   version "16.13.1"
   resolved "https://registry.yarnpkg.com/react/-/react-16.13.1.tgz#2e818822f1a9743122c063d6410d85c1e3afe48e"
   integrity sha512-YMZQQq32xHLX0bz5Mnibv1/LHb3Sqzngu7xstSM+vrkE5Kzr9xE0yMByK5kMoTK30YVJE61WfbxIFFvfeDKT1w==
